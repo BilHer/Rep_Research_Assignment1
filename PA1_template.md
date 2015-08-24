@@ -2,9 +2,11 @@
 title:  '**Reproducible Research: Peer Assessment 1**'
 author: "Bilmar Fernando H. H."
 date: "12 de agosto de 2015"
-output: html_document
+output: 
+  html_document: 
+    fig_caption: yes
 ---
-```{r librerias, echo=FALSE}
+```{r}
 library(ggplot2)
 library(RColorBrewer)
 library(lubridate)
@@ -21,7 +23,7 @@ Process/transform the data (if necessary) into a format suitable for your analys
 *Lubridate's wday function can occupy in the Weekday's full names as ordered factor variables.*  
 *Create a column of these days of the week for each date for subsetting.*
 
-```{r loadata, echo=TRUE}
+```{r}
 activity <- read.csv("activity.csv", colClasses = c("numeric", "character", "numeric"))
 activity$date <- as.Date(activity$date)
 activity$Weekday <- wday(activity$date, label = TRUE, abbr = FALSE)
@@ -34,14 +36,14 @@ For this part of the assignment, you can ignore the missing values in the datase
 
 **1.-** Calculate the total number of steps taken per day
 
-```{r totalStep, echo=TRUE}
+```{r}
 totalStep <- aggregate(steps ~ date, data = activity, sum, na.rm = TRUE)
 print(totalStep)
 ```
 
 Makes a histogram of the total number of steps taken each day
 
-```{r scatterhist, fig.height=4}
+```{r}
 par(mar = c(5, 4, 1, 1), las = 1)
 make.sums.ggplot <- function(activity.dataframe, RBrewers.colors = "Blues"){
   activity.sums <- activity.dataframe %>%
@@ -53,9 +55,9 @@ make.sums.ggplot <- function(activity.dataframe, RBrewers.colors = "Blues"){
   ggplot(activity.sums, aes(x = date, y = totalStep, fill = Weekday)) + geom_bar(stat = "identity") +
     scale_x_date(breaks = "1 day", limits = as.Date(c('2012-10-02','2012-11-29'))) +
     theme_wsj() +    
-    theme(axis.text.x  = element_text(size = 9, angle = 80, colour = "black", vjust = 1, hjust = 1)) + 
+    theme(axis.text.x  = element_text(size = 5, angle = 80, colour = "black", vjust = 1, hjust = 1)) + 
     scale_fill_manual(values = my.cols) + 
-    geom_text(aes(x = date, y = totalStep, label = totalStep, angle  = 90, size = 8, 
+    geom_text(aes(x = date, y = totalStep, label = totalStep, angle  = 90, size = 3, 
                   hjust = -0.1), color = "purple", show_guide  = F) + 
     coord_cartesian(ylim = c(0, max.sum*1.15)) +
     ylab("Total Steps by Day") +
@@ -65,7 +67,7 @@ make.sums.ggplot(activity, "Blues")
 ```
 
 **2.-** Calculate and report the mean and median of the total number of steps taken per day
-```{r mean and median}
+```{r}
 mean(totalStep$steps)
 median(totalStep$steps)
 ```
@@ -73,13 +75,13 @@ median(totalStep$steps)
 ## **What is the average daily activity pattern?**
 
 **1.-** Make a time series plot (i.e. <code>type = "l"</code>) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r time series}
+```{r}
 time_series <- tapply(activity$steps, activity$interval, mean, na.rm = TRUE)
 print(time_series)
 ```
 
 **2.-** Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r ploTimeseries}
+```{r}
 activity$Interval <- as.POSIXct(strptime(sprintf("%04d", activity$interval), "%H%M")) 
 make.max.interval.ggplot <- function(activity.dataframe){
   activity.intervals <- activity.dataframe %>%
@@ -106,14 +108,14 @@ make.max.interval.ggplot(activity)
 _Note that there are a number of days/intervals where there are missing values (coded as <code>NA</code>). The presence of missing days may introduce bias into some calculations or summaries of the data._
 
 **1.-** Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with <code>NA</code>s)
-```{r NA}
+```{r}
 summary(activity)
 NA.activity <- subset(activity, !complete.cases(activity))
 table(NA.activity$date)
 ```
 
 **2.-** Devise a strategy for occupying in all of the missing values in the dataset. The strategy does not need to be sophisticated. _For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc._
-```{r plotinterval}
+```{r}
 interval.summary <- function(activity_frame, interval_string = "all"){
   activity_frame$temp_time <- format(activity_frame$Interval, "%H:%M")
   if (class(interval_string) != "character") {
@@ -147,7 +149,7 @@ imputed <- activity %>%
 ```
 
 **4.-** Make a histogram of the total number of steps taken each day and Calculate and report the **mean** and **median** total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
-```{r stepsTotal2}
+```{r}
 make2.sums.ggplot <- function(activity.dataframe, RBrewers.colors = "Reds"){
   activity.sums <- activity.dataframe %>%
   group_by(date, Weekday) %>%
@@ -158,19 +160,19 @@ make2.sums.ggplot <- function(activity.dataframe, RBrewers.colors = "Reds"){
   ggplot(activity.sums, aes(x = date, y = totalStep, fill = Weekday)) + geom_bar(stat = "identity") +
     scale_x_date(breaks = "1 day", limits = as.Date(c('2012-10-02','2012-11-29'))) +
     theme_wsj() +    
-    theme(axis.text.x  = element_text(size = 9, angle = 45, colour = "black", vjust = 1, hjust = 1)) + 
+    theme(axis.text.x  = element_text(size = 6, angle = 70, colour = "black", vjust = 1, hjust = 1)) + 
     scale_fill_manual(values = my.cols) + 
-    geom_text(aes(x = date, y = totalStep, label = totalStep, angle  = 90, size = 8, 
+    geom_text(aes(x = date, y = totalStep, label = totalStep, angle  = 90, size = 3, 
                   hjust = -0.1), color = "purple", show_guide  = F) + 
     coord_cartesian(ylim = c(0, max.sum*1.15)) +
     geom_hline(aes ( yintercept = mean(totalStep, na.rm = TRUE)), 
                color = "blue", size = 1.5, alpha = .70) + 
     geom_hline(aes ( yintercept = median(totalStep, na.rm = TRUE)), 
                color = "darkgreen",size = 1.5, alpha = .60) +
-    geom_text(aes(label = paste("Mean = ", round(mean(totalStep, na.rm = TRUE), 5)),
-                  x = as.Date('2012-10-07'), y = 19800), color = "blue", size = 6) +
-    geom_text(aes(label = paste("Median = ", round(median(totalStep, na.rm = TRUE), 5)),
-                  x = as.Date('2012-10-06'), y = 18500), color = "darkgreen", size = 6) +
+    geom_text(aes(label = paste("Mean = ", round(mean(totalStep, na.rm = TRUE), 4 )),
+                  x = as.Date('2012-10-10'), y = 21800), color = "blue", size = 5) +
+    geom_text(aes(label = paste("Median = ", round(median(totalStep, na.rm = TRUE), 4)),
+                  x = as.Date('2012-10-09'), y = 20000), color = "darkgreen", size = 5) +
     ylab("Total Steps by Day") +
     xlab(NULL)
 }
@@ -189,7 +191,7 @@ table(imputed$Weekend, imputed$Weekday)
 ```
 
 **2.-** Make a panel plot containing a time series plot (i.e. <code>type = "l"</code>) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
-```{r plotweek}
+```{r}
 make.Weekend.ggplot <- function(activity.dataframe){
   activity.intervals <- activity.dataframe %>%
     group_by(Weekend, Interval) %>%
@@ -198,7 +200,7 @@ make.Weekend.ggplot <- function(activity.dataframe){
     theme_solarized(light = FALSE) +
     geom_line() +
     facet_grid(Weekend~.) +
-    theme(axis.text.x=element_text(angle=270,hjust=1,vjust=0.5, size = 10)) + 
+    theme(axis.text.x = element_text(angle = 270, hjust = 1, vjust = 0.5, size = 9)) + 
     scale_x_datetime(breaks = date_breaks("30 mins"), labels = date_format("%H:%M"),
                      limits = c(activity.intervals$Interval[12], activity.intervals$Interval[286-10])) +
     ylab("Average Steps Across All Days") + 
